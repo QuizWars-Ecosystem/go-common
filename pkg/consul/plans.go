@@ -48,7 +48,7 @@ func (p *Plan) handle(_ uint64, data interface{}) {
 
 func (p *Plan) Run(errCh chan<- error) {
 	go func() {
-		if err := p.plan.RunWithClientAndHclog(p.client, nil); err != nil {
+		if err := p.plan.RunWithClientAndHclog(p.client, p.logger.HCLogger()); err != nil {
 			errCh <- err
 		}
 	}()
