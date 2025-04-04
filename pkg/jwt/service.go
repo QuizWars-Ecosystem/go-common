@@ -4,8 +4,9 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
+	apperrors "github.com/Brain-Wave-Ecosystem/go-common/pkg/error"
 	rand2 "math/rand/v2"
-	"strconv"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -31,12 +32,12 @@ func NewService(secret string, accessExpiration, refreshExpiration time.Duration
 	}
 }
 
-func (s *Service) GenerateToken(userID int64, role string) (string, error) {
+func (s *Service) GenerateToken(userID string, role string) (string, error) {
 	now := time.Now()
 	claims := &AccessClaims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			ID:        uuid.New().String(),
-			Subject:   strconv.FormatInt(userID, 10),
+			Subject:   userID,
 			IssuedAt:  jwt.NewNumericDate(now),
 			ExpiresAt: jwt.NewNumericDate(now.Add(s.accessExpiration)),
 		},
@@ -67,4 +68,83 @@ func (s *Service) GetAccessExpiration() time.Duration {
 
 func (s *Service) GetRefreshExpiration() time.Duration {
 	return s.refreshExpiration
+}
+
+func (s *Service) ValidateToken(tokenString string) (*AccessClaims, error) {
+	token, err := jwt.ParseWithClaims(clearToken(tokenString), &AccessClaims{}, func(_ *jwt.Token) (any, error) {
+		return []byte(s.secret), nil
+	})
+
+	if err != nil && tokenString == "" {
+		return nil, apperrors.Forbidden("access token not provided")
+	}
+
+	if err != nil {
+		return nil, apperrors.Forbidden("invalid token")
+	}
+
+	claims, ok := token.Claims.(*AccessClaims)
+	if ok && token.Valid {
+		return claims, nil
+	}
+
+	return nil, apperrors.Unauthorized("Access token invalid")
+}
+
+func (s *Service) ValidateRoleToken(tokenString string, role string) error {
+	token, err := jwt.ParseWithClaims(clearToken(tokenString), &AccessClaims{}, func(_ *jwt.Token) (any, error) {
+		return []byte(s.secret), nil
+	})
+
+	if err != nil && tokenString == "" {
+		return apperrors.Forbidden("access token not provided")
+	}
+
+	if err != nil {
+		return apperrors.Forbidden("invalid token")
+	}
+
+	claims, ok := token.Claims.(*AccessClaims)
+	if ok && token.Valid {
+		if claims.Role == string(Admin) {
+			return nil
+		}
+
+		if claims.Role != role {
+			return apperrors.Forbidden("access token invalid")
+		}
+	}
+
+	return apperrors.Unauthorized("access token invalid")
+}
+
+func (s *Service) ValidateUserIDToken(tokenString string, userID string) error {
+	token, err := jwt.ParseWithClaims(clearToken(tokenString), &AccessClaims{}, func(_ *jwt.Token) (any, error) {
+		return []byte(s.secret), nil
+	})
+
+	if err != nil && tokenString == "" {
+		return apperrors.Forbidden("access token not provided")
+	}
+
+	if err != nil {
+		return apperrors.Forbidden("invalid token")
+	}
+
+	claims, ok := token.Claims.(*AccessClaims)
+	if ok && token.Valid {
+		if claims.Role == string(Admin) {
+			return nil
+		}
+
+		if claims.UserID != userID {
+			return apperrors.Forbidden("access token invalid")
+		}
+	}
+
+	return apperrors.Unauthorized("access token invalid")
+}
+
+func clearToken(tokenStr string) string {
+	return strings.TrimPrefix(tokenStr, "Bearer ")
 }
