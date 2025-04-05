@@ -1,4 +1,4 @@
-package tern
+package migrations
 
 import (
 	"testing"
@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func RunMigration(t *testing.T, connString, migrationPath string) {
+func RunMigrations(t *testing.T, connString, migrationPath string) {
 	conn, err := pgx.Connect(t.Context(), connString)
 	require.NoError(t, err)
 
