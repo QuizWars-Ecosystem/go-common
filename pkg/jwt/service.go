@@ -4,10 +4,11 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
-	apperrors "github.com/Brain-Wave-Ecosystem/go-common/pkg/error"
 	rand2 "math/rand/v2"
 	"strings"
 	"time"
+
+	apperrors "github.com/Brain-Wave-Ecosystem/go-common/pkg/error"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"

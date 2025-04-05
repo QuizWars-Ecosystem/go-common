@@ -2,10 +2,11 @@ package errors
 
 import (
 	"errors"
+	"testing"
+
 	apperrors "github.com/Brain-Wave-Ecosystem/go-common/pkg/error"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
-	"testing"
 )
 
 func RequireNotFoundError(t *testing.T, err error, subject, key string, value any) {

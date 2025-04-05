@@ -2,6 +2,7 @@ package containers
 
 import (
 	"context"
+
 	"github.com/QuizWars-Ecosystem/go-common/pkg/testing/config"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/kafka"

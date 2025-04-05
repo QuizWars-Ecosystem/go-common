@@ -2,11 +2,12 @@ package containers
 
 import (
 	"context"
+	"time"
+
 	"github.com/QuizWars-Ecosystem/go-common/pkg/testing/config"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
-	"time"
 )
 
 func NewPostgresContainer(ctx context.Context, cfg *config.PostgresConfig) (*postgres.PostgresContainer, error) {
