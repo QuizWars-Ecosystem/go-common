@@ -1,10 +1,11 @@
 package tern
 
 import (
+	"testing"
+
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/tern/migrate"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func RunMigration(t *testing.T, connString, migrationPath string) {
