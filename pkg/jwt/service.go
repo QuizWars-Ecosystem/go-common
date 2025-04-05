@@ -19,6 +19,13 @@ const (
 	randMax = 999999
 )
 
+const (
+	AuthAccessTokenNotProvidedError = "access token not provided"
+	AuthInvalidTokenError           = "invalid token"
+	AuthPermissionDeniedError       = "permission denied"
+	AuthAccessTokenInvalid          = "access token invalid"
+)
+
 type Service struct {
 	secret            string
 	accessExpiration  time.Duration
@@ -77,11 +84,11 @@ func (s *Service) ValidateToken(tokenString string) (*AccessClaims, error) {
 	})
 
 	if err != nil && tokenString == "" {
-		return nil, apperrors.Forbidden("access token not provided")
+		return nil, apperrors.Forbidden(AuthAccessTokenNotProvidedError)
 	}
 
 	if err != nil {
-		return nil, apperrors.Forbidden("invalid token")
+		return nil, apperrors.Forbidden(AuthInvalidTokenError)
 	}
 
 	claims, ok := token.Claims.(*AccessClaims)
@@ -89,7 +96,7 @@ func (s *Service) ValidateToken(tokenString string) (*AccessClaims, error) {
 		return claims, nil
 	}
 
-	return nil, apperrors.Unauthorized("Access token invalid")
+	return nil, apperrors.Unauthorized(AuthAccessTokenInvalid)
 }
 
 func (s *Service) ValidateRoleToken(tokenString string, role string) error {
@@ -98,11 +105,11 @@ func (s *Service) ValidateRoleToken(tokenString string, role string) error {
 	})
 
 	if err != nil && tokenString == "" {
-		return apperrors.Forbidden("access token not provided")
+		return apperrors.Forbidden(AuthAccessTokenNotProvidedError)
 	}
 
 	if err != nil {
-		return apperrors.Forbidden("invalid token")
+		return apperrors.Forbidden(AuthInvalidTokenError)
 	}
 
 	claims, ok := token.Claims.(*AccessClaims)
@@ -112,11 +119,11 @@ func (s *Service) ValidateRoleToken(tokenString string, role string) error {
 		}
 
 		if claims.Role != role {
-			return apperrors.Forbidden("access token invalid")
+			return apperrors.Forbidden(AuthPermissionDeniedError)
 		}
 	}
 
-	return apperrors.Unauthorized("access token invalid")
+	return apperrors.Unauthorized(AuthAccessTokenInvalid)
 }
 
 func (s *Service) ValidateUserIDToken(tokenString string, userID string) error {
@@ -125,11 +132,11 @@ func (s *Service) ValidateUserIDToken(tokenString string, userID string) error {
 	})
 
 	if err != nil && tokenString == "" {
-		return apperrors.Forbidden("access token not provided")
+		return apperrors.Forbidden(AuthAccessTokenNotProvidedError)
 	}
 
 	if err != nil {
-		return apperrors.Forbidden("invalid token")
+		return apperrors.Forbidden(AuthInvalidTokenError)
 	}
 
 	claims, ok := token.Claims.(*AccessClaims)
@@ -139,11 +146,11 @@ func (s *Service) ValidateUserIDToken(tokenString string, userID string) error {
 		}
 
 		if claims.UserID != userID {
-			return apperrors.Forbidden("access token invalid")
+			return apperrors.Forbidden(AuthPermissionDeniedError)
 		}
 	}
 
-	return apperrors.Unauthorized("access token invalid")
+	return apperrors.Unauthorized(AuthAccessTokenInvalid)
 }
 
 func clearToken(tokenStr string) string {

@@ -1,7 +1,7 @@
 package errors
 
 import (
-	"errors"
+	"google.golang.org/grpc/status"
 	"testing"
 
 	apperrors "github.com/Brain-Wave-Ecosystem/go-common/pkg/error"
@@ -32,9 +32,8 @@ func RequireAlreadyExistsError(t *testing.T, err error, subject, key string, val
 }
 
 func requireAPIError(t *testing.T, err error, code codes.Code, msg string) {
-	var cerr *apperrors.Error
-	ok := errors.As(err, &cerr)
-	require.True(t, ok, "expected apperrors.Error")
-	require.Equal(t, code, cerr.Code)
-	require.Contains(t, cerr.Error(), msg)
+	s, ok := status.FromError(err)
+	require.True(t, ok, "expected grpc status error")
+	require.Equal(t, code, s.Code())
+	require.Contains(t, s.Message(), msg)
 }
