@@ -1,27 +1,22 @@
 package log
 
 import (
-	"context"
 	"github.com/QuizWars-Ecosystem/go-common/pkg/abstractions"
 	"io"
+	"strings"
 
-	"github.com/DavidMovas/gopherbox/pkg/closer"
 	"go.uber.org/zap"
 )
 
 var _ abstractions.ILogger = (*Logger)(nil)
 
 type Logger struct {
-	zap    *zap.Logger
-	file   io.Closer
-	closer *closer.Closer
+	zap  *zap.Logger
+	file io.Closer
 }
 
 func NewLogger(local bool, level string) *Logger {
 	logger := &Logger{}
-
-	c := closer.NewCloser()
-	logger.closer = c
 
 	atomicLevel := levelFromString(level)
 
@@ -37,11 +32,17 @@ func NewLogger(local bool, level string) *Logger {
 	cfg.OutputPaths = []string{"stdout"}
 	logger.zap, _ = cfg.Build(zap.WithCaller(true))
 
-	c.Push(logger.zap.Sync)
-
 	return logger
 }
 
 func (l *Logger) Close() error {
-	return l.closer.Close(context.Background())
+	if err := l.zap.Sync(); err != nil && !isStdoutSyncErr(err) {
+		return err
+	}
+
+	return nil
+}
+
+func isStdoutSyncErr(err error) bool {
+	return strings.Contains(err.Error(), "sync /dev/stdout: invalid argument")
 }
