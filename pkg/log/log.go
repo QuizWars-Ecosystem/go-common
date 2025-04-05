@@ -44,5 +44,5 @@ func (l *Logger) Close() error {
 }
 
 func isStdoutSyncErr(err error) bool {
-	return strings.Contains(err.Error(), "sync /dev/stdout: invalid argument")
+	return strings.Contains(err.Error(), "sync")
 }
