@@ -1,0 +1,67 @@
+package jwt
+
+import (
+	"context"
+	apperrors "github.com/Brain-Wave-Ecosystem/go-common/pkg/error"
+	"google.golang.org/grpc/metadata"
+)
+
+const (
+	AuthorizationHeader = "authorization"
+)
+
+func (s *Service) GenerateTokenWithContext(ctx context.Context, userID, role string) (context.Context, error) {
+	token, err := s.GenerateToken(userID, role)
+	if err != nil {
+		return ctx, err
+	}
+
+	return metadata.AppendToOutgoingContext(ctx, AuthorizationHeader, token), nil
+}
+
+func (s *Service) ValidateTokenWithContext(ctx context.Context) (*AccessClaims, error) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, apperrors.Unauthorized(AuthAccessTokenNotProvidedError)
+	}
+
+	token := md.Get(AuthorizationHeader)[0]
+	if token == "" {
+		return nil, apperrors.Unauthorized(AuthAccessTokenNotProvidedError)
+	}
+
+	claims, err := s.ValidateToken(token)
+	if err != nil {
+		return nil, err
+	}
+
+	return claims, nil
+}
+
+func (s *Service) ValidateUserIDWithContext(ctx context.Context, userID string) error {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return apperrors.Unauthorized(AuthAccessTokenNotProvidedError)
+	}
+
+	token := md.Get(AuthorizationHeader)[0]
+	if token == "" {
+		return apperrors.Unauthorized(AuthAccessTokenNotProvidedError)
+	}
+
+	return s.ValidateUserIDToken(token, userID)
+}
+
+func (s *Service) ValidateRoleWithContext(ctx context.Context, role string) error {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return apperrors.Unauthorized(AuthAccessTokenNotProvidedError)
+	}
+
+	token := md.Get(AuthorizationHeader)[0]
+	if token == "" {
+		return apperrors.Unauthorized(AuthAccessTokenNotProvidedError)
+	}
+
+	return s.ValidateRoleToken(token, role)
+}
