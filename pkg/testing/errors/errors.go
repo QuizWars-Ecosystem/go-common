@@ -1,8 +1,9 @@
 package errors
 
 import (
-	"google.golang.org/grpc/status"
 	"testing"
+
+	"google.golang.org/grpc/status"
 
 	apperrors "github.com/Brain-Wave-Ecosystem/go-common/pkg/error"
 	"github.com/stretchr/testify/require"
