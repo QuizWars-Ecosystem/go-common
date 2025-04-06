@@ -79,3 +79,7 @@ func (s *Service) GetTokenFromContext(ctx context.Context) (string, error) {
 
 	return strings[0], nil
 }
+
+func (s *Service) SetTokenInContext(ctx context.Context, token string) context.Context {
+	return metadata.AppendToOutgoingContext(ctx, AuthorizationHeader, token)
+}
