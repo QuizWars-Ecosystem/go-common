@@ -65,3 +65,17 @@ func (s *Service) ValidateRoleWithContext(ctx context.Context, role string) erro
 
 	return s.ValidateRoleToken(strings[0], role)
 }
+
+func (s *Service) GetTokenFromContext(ctx context.Context) (string, error) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return "", apperrors.Unauthorized(AuthAccessTokenNotProvidedError)
+	}
+
+	strings := md.Get(AuthorizationHeader)
+	if len(strings) == 0 {
+		return "", apperrors.Unauthorized(AuthAccessTokenNotProvidedError)
+	}
+
+	return strings[0], nil
+}
