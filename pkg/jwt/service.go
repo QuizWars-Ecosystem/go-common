@@ -121,6 +121,8 @@ func (s *Service) ValidateRoleToken(tokenString string, role string) error {
 		if claims.Role != role {
 			return apperrors.Forbidden(AuthPermissionDeniedError)
 		}
+
+		return nil
 	}
 
 	return apperrors.Unauthorized(AuthAccessTokenInvalid)
@@ -148,6 +150,8 @@ func (s *Service) ValidateUserIDToken(tokenString string, userID string) error {
 		if claims.UserID != userID {
 			return apperrors.Forbidden(AuthPermissionDeniedError)
 		}
+
+		return nil
 	}
 
 	return apperrors.Unauthorized(AuthAccessTokenInvalid)
