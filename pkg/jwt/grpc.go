@@ -25,12 +25,12 @@ func (s *Service) ValidateTokenWithContext(ctx context.Context) (*AccessClaims, 
 		return nil, apperrors.Unauthorized(AuthAccessTokenNotProvidedError)
 	}
 
-	token := md.Get(AuthorizationHeader)[0]
-	if token == "" {
+	strings := md.Get(AuthorizationHeader)
+	if len(strings) == 0 {
 		return nil, apperrors.Unauthorized(AuthAccessTokenNotProvidedError)
 	}
 
-	claims, err := s.ValidateToken(token)
+	claims, err := s.ValidateToken(strings[0])
 	if err != nil {
 		return nil, err
 	}
@@ -44,12 +44,12 @@ func (s *Service) ValidateUserIDWithContext(ctx context.Context, userID string) 
 		return apperrors.Unauthorized(AuthAccessTokenNotProvidedError)
 	}
 
-	token := md.Get(AuthorizationHeader)[0]
-	if token == "" {
+	strings := md.Get(AuthorizationHeader)
+	if len(strings) == 0 {
 		return apperrors.Unauthorized(AuthAccessTokenNotProvidedError)
 	}
 
-	return s.ValidateUserIDToken(token, userID)
+	return s.ValidateUserIDToken(strings[0], userID)
 }
 
 func (s *Service) ValidateRoleWithContext(ctx context.Context, role string) error {
@@ -58,10 +58,10 @@ func (s *Service) ValidateRoleWithContext(ctx context.Context, role string) erro
 		return apperrors.Unauthorized(AuthAccessTokenNotProvidedError)
 	}
 
-	token := md.Get(AuthorizationHeader)[0]
-	if token == "" {
+	strings := md.Get(AuthorizationHeader)
+	if len(strings) == 0 {
 		return apperrors.Unauthorized(AuthAccessTokenNotProvidedError)
 	}
 
-	return s.ValidateRoleToken(token, role)
+	return s.ValidateRoleToken(strings[0], role)
 }
