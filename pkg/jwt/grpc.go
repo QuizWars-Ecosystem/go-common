@@ -8,6 +8,7 @@ import (
 
 const (
 	AuthorizationHeader = "authorization"
+	Bearer              = "Bearer "
 )
 
 func (s *Service) GenerateTokenWithContext(ctx context.Context, userID, role string) (context.Context, error) {
@@ -16,7 +17,7 @@ func (s *Service) GenerateTokenWithContext(ctx context.Context, userID, role str
 		return ctx, err
 	}
 
-	return metadata.AppendToOutgoingContext(ctx, AuthorizationHeader, token), nil
+	return metadata.AppendToOutgoingContext(ctx, AuthorizationHeader, Bearer+token), nil
 }
 
 func (s *Service) ValidateTokenWithContext(ctx context.Context) (*AccessClaims, error) {
