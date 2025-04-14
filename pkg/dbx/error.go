@@ -34,10 +34,10 @@ func IsNoRows(err error) bool {
 	return errors.Is(err, pgx.ErrNoRows)
 }
 
-func NotValidEnumType(err error) bool {
+func NotValidEnumType(err error, name string) bool {
 	var pgError *pgconn.PgError
 	if errors.As(err, &pgError) {
-		return pgError.Code == pgerrcode.InvalidTextRepresentation
+		return pgError.Code == pgerrcode.InvalidTextRepresentation && strings.Contains(pgError.ConstraintName, name)
 	}
 	return false
 }
