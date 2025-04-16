@@ -10,6 +10,5 @@ func NewUUIDFromString(id string) (pgxuuid.UUID, error) {
 	if err != nil {
 		return pgxuuid.UUID{}, err
 	}
-
 	return pgxuuid.UUID{UUID: res}, nil
 }
