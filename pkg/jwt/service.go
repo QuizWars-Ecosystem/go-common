@@ -4,8 +4,10 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
+	"github.com/QuizWars-Ecosystem/go-common/pkg/abstractions"
 	rand2 "math/rand/v2"
 	"strings"
+	"sync"
 	"time"
 
 	apperrors "github.com/Brain-Wave-Ecosystem/go-common/pkg/error"
@@ -26,35 +28,62 @@ const (
 	AuthAccessTokenInvalid          = "access token invalid"
 )
 
+var _ abstractions.ConfigSubscriber[*Config] = (*Service)(nil)
+
+type Config struct {
+	secret            string        `mapstructure:"secret"`
+	accessExpiration  time.Duration `mapstructure:"access_expiration"`
+	refreshExpiration time.Duration `mapstructure:"refresh_expiration"`
+}
+
 type Service struct {
-	secret            string
-	accessExpiration  time.Duration
-	refreshExpiration time.Duration
+	cfg *Config
+	mx  sync.RWMutex
+}
+
+func (s *Service) SectionKey() string {
+	return "JWT"
+}
+
+func (s *Service) UpdateConfig(newCfg *Config) error {
+	s.mx.Lock()
+	defer s.mx.Unlock()
+
+	s.cfg = newCfg
+
+	return nil
 }
 
 func NewService(secret string, accessExpiration, refreshExpiration time.Duration) *Service {
-	return &Service{
+	cfg := &Config{
 		secret:            secret,
 		accessExpiration:  accessExpiration,
 		refreshExpiration: refreshExpiration,
 	}
+
+	return &Service{
+		cfg: cfg,
+	}
 }
 
 func (s *Service) GenerateToken(userID string, role string) (string, error) {
+	s.mx.RLock()
+	defer s.mx.RUnlock()
+
 	now := time.Now()
 	claims := &AccessClaims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			ID:        uuid.New().String(),
 			Subject:   userID,
 			IssuedAt:  jwt.NewNumericDate(now),
-			ExpiresAt: jwt.NewNumericDate(now.Add(s.accessExpiration)),
+			ExpiresAt: jwt.NewNumericDate(now.Add(s.cfg.accessExpiration)),
 		},
 		UserID: userID,
 		Role:   role,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(s.secret))
+	return token.SignedString([]byte(s.cfg.secret))
 }
 
 func (s *Service) GenerateRefreshToken() (string, error) {
@@ -71,16 +100,25 @@ func (s *Service) GenerateCode() int {
 }
 
 func (s *Service) GetAccessExpiration() time.Duration {
-	return s.accessExpiration
+	s.mx.RLock()
+	defer s.mx.RUnlock()
+
+	return s.cfg.accessExpiration
 }
 
 func (s *Service) GetRefreshExpiration() time.Duration {
-	return s.refreshExpiration
+	s.mx.RLock()
+	defer s.mx.RUnlock()
+
+	return s.cfg.refreshExpiration
 }
 
 func (s *Service) ValidateToken(tokenString string) (*AccessClaims, error) {
+	s.mx.RLock()
+	defer s.mx.RUnlock()
+
 	token, err := jwt.ParseWithClaims(clearToken(tokenString), &AccessClaims{}, func(_ *jwt.Token) (any, error) {
-		return []byte(s.secret), nil
+		return []byte(s.cfg.secret), nil
 	})
 
 	if err != nil && tokenString == "" {
@@ -100,8 +138,10 @@ func (s *Service) ValidateToken(tokenString string) (*AccessClaims, error) {
 }
 
 func (s *Service) ValidateRoleToken(tokenString string, role string) error {
+	s.mx.RLock()
+	defer s.mx.RUnlock()
 	token, err := jwt.ParseWithClaims(clearToken(tokenString), &AccessClaims{}, func(_ *jwt.Token) (any, error) {
-		return []byte(s.secret), nil
+		return []byte(s.cfg.secret), nil
 	})
 
 	if err != nil && tokenString == "" {
@@ -129,8 +169,10 @@ func (s *Service) ValidateRoleToken(tokenString string, role string) error {
 }
 
 func (s *Service) ValidateUserIDToken(tokenString string, userID string) error {
+	s.mx.RLock()
+	defer s.mx.RUnlock()
 	token, err := jwt.ParseWithClaims(clearToken(tokenString), &AccessClaims{}, func(_ *jwt.Token) (any, error) {
-		return []byte(s.secret), nil
+		return []byte(s.cfg.secret), nil
 	})
 
 	if err != nil && tokenString == "" {

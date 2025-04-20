@@ -4,6 +4,7 @@ import (
 	"github.com/QuizWars-Ecosystem/go-common/pkg/log"
 	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/consul/api/watch"
+	"go.uber.org/zap"
 )
 
 const planType = "service"
@@ -40,6 +41,9 @@ func NewPlan(client *api.Client, logger *log.Logger, serviceName string, input c
 func (p *Plan) handle(_ uint64, data interface{}) {
 	if !p.plan.IsStopped() {
 		entries := data.([]*api.ServiceEntry)
+
+		p.logger.Zap().Debug("consul plan", zap.String("service", p.service), zap.Int("count", len(entries)))
+
 		if len(entries) > 0 {
 			p.input <- entries
 		}
@@ -49,15 +53,19 @@ func (p *Plan) handle(_ uint64, data interface{}) {
 func (p *Plan) Run(errCh chan<- error) {
 	go func() {
 		if err := p.plan.RunWithClientAndHclog(p.client, p.logger.HCLogger()); err != nil {
+			p.logger.Zap().Debug("consul plan running...", zap.String("service", p.service))
 			errCh <- err
 		}
 	}()
 
+	p.logger.Zap().Debug("consul plan running...", zap.String("service", p.service))
 	p.errCh = errCh
 }
 
 func (p *Plan) Stop() {
 	p.plan.Stop()
+
+	p.logger.Zap().Debug("consul plan stopping...", zap.String("service", p.service))
 
 	if p.plan.IsStopped() {
 		close(p.input)
