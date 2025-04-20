@@ -41,6 +41,12 @@ type Service struct {
 	mx  sync.RWMutex
 }
 
+func NewService(cfg *Config) *Service {
+	return &Service{
+		cfg: cfg,
+	}
+}
+
 func (s *Service) SectionKey() string {
 	return "JWT"
 }
@@ -52,18 +58,6 @@ func (s *Service) UpdateConfig(newCfg *Config) error {
 	s.cfg = newCfg
 
 	return nil
-}
-
-func NewService(secret string, accessExpiration, refreshExpiration time.Duration) *Service {
-	cfg := &Config{
-		secret:            secret,
-		accessExpiration:  accessExpiration,
-		refreshExpiration: refreshExpiration,
-	}
-
-	return &Service{
-		cfg: cfg,
-	}
 }
 
 func (s *Service) GenerateToken(userID string, role string) (string, error) {

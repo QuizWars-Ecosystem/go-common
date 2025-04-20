@@ -8,7 +8,7 @@ import (
 	"sync"
 )
 
-type Loader[C any] struct {
+type Manager[C any] struct {
 	v              *viper.Viper
 	path           string
 	cfg            *C
@@ -16,7 +16,7 @@ type Loader[C any] struct {
 	mx             sync.RWMutex
 }
 
-func NewLoader[C any](path string) (*Loader[C], error) {
+func NewManager[C any](path string) (*Manager[C], error) {
 	v := viper.New()
 	v.SetConfigFile(path)
 	v.SetConfigType("yaml")
@@ -31,7 +31,7 @@ func NewLoader[C any](path string) (*Loader[C], error) {
 		return nil, fmt.Errorf("failed to unmarshal config: %w", err)
 	}
 
-	var loader Loader[C]
+	var loader Manager[C]
 	loader.v = v
 	loader.path = path
 	loader.cfg = cfg
@@ -40,11 +40,11 @@ func NewLoader[C any](path string) (*Loader[C], error) {
 	return &loader, nil
 }
 
-func (l *Loader[C]) Config() *C {
+func (l *Manager[C]) Config() *C {
 	return l.cfg
 }
 
-func (l *Loader[C]) Watch(logger *zap.Logger) {
+func (l *Manager[C]) Watch(logger *zap.Logger) {
 
 	l.v.WatchConfig()
 	l.v.OnConfigChange(func(e fsnotify.Event) {
@@ -71,7 +71,7 @@ func (l *Loader[C]) Watch(logger *zap.Logger) {
 
 }
 
-func (l *Loader[C]) Subscribe(key string, updateFn func(cfg *C) error) {
+func (l *Manager[C]) Subscribe(key string, updateFn func(cfg *C) error) {
 	l.mx.Lock()
 	defer l.mx.Unlock()
 

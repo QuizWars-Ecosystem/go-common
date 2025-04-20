@@ -6,7 +6,6 @@ import (
 
 type GatewayConfig struct {
 	Local        bool          `mapstructure:"local"`
-	LogLovel     string        `mapstructure:"log_lovel"`
 	HTTPPort     int           `mapstructure:"http_port"`
 	TCPPort      int           `mapstructure:"tcp_port"`
 	GRPCPort     int           `mapstructure:"grpc_port"`
@@ -20,7 +19,6 @@ type ServiceConfig struct {
 	Name         string        `mapstructure:"name"`
 	Address      string        `mapstructure:"address"`
 	Local        bool          `mapstructure:"local"`
-	LogLovel     string        `mapstructure:"log_lovel"`
 	GRPCPort     int           `mapstructure:"grpc_port"`
 	StartTimeout time.Duration `mapstructure:"start_timeout"`
 	StopTimeout  time.Duration `mapstructure:"stop_timeout"`
