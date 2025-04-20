@@ -31,9 +31,9 @@ const (
 var _ abstractions.ConfigSubscriber[*Config] = (*Service)(nil)
 
 type Config struct {
-	secret            string        `mapstructure:"secret"`
-	accessExpiration  time.Duration `mapstructure:"access_expiration"`
-	refreshExpiration time.Duration `mapstructure:"refresh_expiration"`
+	Secret            string        `mapstructure:"Secret"`
+	AccessExpiration  time.Duration `mapstructure:"access_expiration"`
+	RefreshExpiration time.Duration `mapstructure:"refresh_expiration"`
 }
 
 type Service struct {
@@ -70,14 +70,14 @@ func (s *Service) GenerateToken(userID string, role string) (string, error) {
 			ID:        uuid.New().String(),
 			Subject:   userID,
 			IssuedAt:  jwt.NewNumericDate(now),
-			ExpiresAt: jwt.NewNumericDate(now.Add(s.cfg.accessExpiration)),
+			ExpiresAt: jwt.NewNumericDate(now.Add(s.cfg.AccessExpiration)),
 		},
 		UserID: userID,
 		Role:   role,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(s.cfg.secret))
+	return token.SignedString([]byte(s.cfg.Secret))
 }
 
 func (s *Service) GenerateRefreshToken() (string, error) {
@@ -97,14 +97,14 @@ func (s *Service) GetAccessExpiration() time.Duration {
 	s.mx.RLock()
 	defer s.mx.RUnlock()
 
-	return s.cfg.accessExpiration
+	return s.cfg.AccessExpiration
 }
 
 func (s *Service) GetRefreshExpiration() time.Duration {
 	s.mx.RLock()
 	defer s.mx.RUnlock()
 
-	return s.cfg.refreshExpiration
+	return s.cfg.RefreshExpiration
 }
 
 func (s *Service) ValidateToken(tokenString string) (*AccessClaims, error) {
@@ -112,7 +112,7 @@ func (s *Service) ValidateToken(tokenString string) (*AccessClaims, error) {
 	defer s.mx.RUnlock()
 
 	token, err := jwt.ParseWithClaims(clearToken(tokenString), &AccessClaims{}, func(_ *jwt.Token) (any, error) {
-		return []byte(s.cfg.secret), nil
+		return []byte(s.cfg.Secret), nil
 	})
 
 	if err != nil && tokenString == "" {
@@ -135,7 +135,7 @@ func (s *Service) ValidateRoleToken(tokenString string, role string) error {
 	s.mx.RLock()
 	defer s.mx.RUnlock()
 	token, err := jwt.ParseWithClaims(clearToken(tokenString), &AccessClaims{}, func(_ *jwt.Token) (any, error) {
-		return []byte(s.cfg.secret), nil
+		return []byte(s.cfg.Secret), nil
 	})
 
 	if err != nil && tokenString == "" {
@@ -166,7 +166,7 @@ func (s *Service) ValidateUserIDToken(tokenString string, userID string) error {
 	s.mx.RLock()
 	defer s.mx.RUnlock()
 	token, err := jwt.ParseWithClaims(clearToken(tokenString), &AccessClaims{}, func(_ *jwt.Token) (any, error) {
-		return []byte(s.cfg.secret), nil
+		return []byte(s.cfg.Secret), nil
 	})
 
 	if err != nil && tokenString == "" {
