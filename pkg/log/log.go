@@ -9,8 +9,10 @@ import (
 	"go.uber.org/zap"
 )
 
-var _ abstractions.ILogger = (*Logger)(nil)
-var _ abstractions.ConfigSubscriber[*Config] = (*Logger)(nil)
+var (
+	_ abstractions.ILogger                   = (*Logger)(nil)
+	_ abstractions.ConfigSubscriber[*Config] = (*Logger)(nil)
+)
 
 type Config struct {
 	Level string `mapstructure:"level"`

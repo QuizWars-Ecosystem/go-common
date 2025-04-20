@@ -2,10 +2,11 @@ package config
 
 import (
 	"fmt"
+	"sync"
+
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
-	"sync"
 )
 
 type Manager[C any] struct {
@@ -45,7 +46,6 @@ func (l *Manager[C]) Config() *C {
 }
 
 func (l *Manager[C]) Watch(logger *zap.Logger) {
-
 	l.v.WatchConfig()
 	l.v.OnConfigChange(func(e fsnotify.Event) {
 		newCfg := new(C)
@@ -68,7 +68,6 @@ func (l *Manager[C]) Watch(logger *zap.Logger) {
 
 		l.cfg = newCfg
 	})
-
 }
 
 func (l *Manager[C]) Subscribe(key string, updateFn func(cfg *C) error) {
