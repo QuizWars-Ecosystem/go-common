@@ -29,6 +29,10 @@ const (
 	AuthAccessTokenInvalid          = "access token invalid"
 )
 
+var (
+	ultimativeRoleList = []string{string(Admin), string(Super)}
+)
+
 var _ abstractions.ConfigSubscriber[*Config] = (*Service)(nil)
 
 type Config struct {
@@ -149,7 +153,7 @@ func (s *Service) ValidateRoleToken(tokenString string, role string) error {
 
 	claims, ok := token.Claims.(*AccessClaims)
 	if ok && token.Valid {
-		if claims.Role == string(Admin) {
+		if ultimativeRoles(claims.Role) {
 			return nil
 		}
 
@@ -180,7 +184,7 @@ func (s *Service) ValidateUserIDToken(tokenString string, userID string) error {
 
 	claims, ok := token.Claims.(*AccessClaims)
 	if ok && token.Valid {
-		if claims.Role == string(Admin) {
+		if ultimativeRoles(claims.Role) {
 			return nil
 		}
 
@@ -196,4 +200,14 @@ func (s *Service) ValidateUserIDToken(tokenString string, userID string) error {
 
 func clearToken(tokenStr string) string {
 	return strings.TrimPrefix(tokenStr, "Bearer ")
+}
+
+func ultimativeRoles(role string) bool {
+	for _, r := range ultimativeRoleList {
+		if role == r {
+			return true
+		}
+	}
+
+	return false
 }
