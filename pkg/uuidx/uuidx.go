@@ -1,14 +1,17 @@
 package uuidx
 
 import (
-	"github.com/gofrs/uuid"
-	pgxuuid "github.com/jackc/pgx/pgtype/ext/gofrs-uuid"
+	apperrors "github.com/Brain-Wave-Ecosystem/go-common/pkg/error"
+	"github.com/google/uuid"
 )
 
-func NewUUIDFromString(id string) (pgxuuid.UUID, error) {
-	res, err := uuid.FromString(id)
-	if err != nil {
-		return pgxuuid.UUID{}, err
+func Parse(str string) (uuid.UUID, error) {
+	var id uuid.UUID
+	var err error
+
+	if id, err = uuid.Parse(str); err != nil {
+		return uuid.Nil, apperrors.BadRequestHidden(err, "invalid uuid format")
 	}
-	return pgxuuid.UUID{UUID: res}, nil
+
+	return id, nil
 }
