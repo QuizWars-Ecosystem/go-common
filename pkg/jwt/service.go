@@ -29,9 +29,7 @@ const (
 	AuthAccessTokenInvalid          = "access token invalid"
 )
 
-var (
-	ultimativeRoleList = []string{string(Admin), string(Super)}
-)
+var ultimativeRoleList = []string{string(Admin), string(Super)}
 
 var _ abstractions.ConfigSubscriber[*Config] = (*Service)(nil)
 
