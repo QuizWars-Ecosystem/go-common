@@ -64,10 +64,10 @@ func init() {
 
 func ServerMetricsInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		defer prometheus.NewTimer(serverDurationRequestsHistogram.WithLabelValues(info.FullMethod)).ObserveDuration()
-
 		serverActiveRequestsGauge.WithLabelValues(info.FullMethod).Inc()
 		defer serverActiveRequestsGauge.WithLabelValues(info.FullMethod).Dec()
+
+		defer prometheus.NewTimer(serverDurationRequestsHistogram.WithLabelValues(info.FullMethod)).ObserveDuration()
 
 		res, err := handler(ctx, req)
 		code := status.Code(err)
