@@ -1,4 +1,4 @@
-package _metrics
+package metrics
 
 import (
 	"context"
