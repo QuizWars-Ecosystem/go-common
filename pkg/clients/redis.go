@@ -37,7 +37,6 @@ func NewRedisClient(url string, options *RedisOptions) (*redis.Client, error) {
 	if err := client.Ping(pingCtx).Err(); err != nil {
 		return nil, apperrors.Internal(err)
 	}
-
 	if opts.traceEnabled {
 		if err := redisotel.InstrumentTracing(client, redisotel.WithTracerProvider(opts.provider)); err != nil {
 			return nil, apperrors.Internal(err)
