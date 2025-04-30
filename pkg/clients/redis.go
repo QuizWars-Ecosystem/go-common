@@ -3,10 +3,11 @@ package clients
 import (
 	"context"
 	"crypto/tls"
-	"github.com/redis/go-redis/extra/redisotel/v9"
-	"go.opentelemetry.io/otel/trace"
 	"net"
 	"time"
+
+	"github.com/redis/go-redis/extra/redisotel/v9"
+	"go.opentelemetry.io/otel/trace"
 
 	apperrors "github.com/Brain-Wave-Ecosystem/go-common/pkg/error"
 

@@ -2,10 +2,11 @@ package clients
 
 import (
 	"context"
-	"github.com/exaring/otelpgx"
-	"go.opentelemetry.io/otel/trace"
 	"net"
 	"time"
+
+	"github.com/exaring/otelpgx"
+	"go.opentelemetry.io/otel/trace"
 
 	apperrors "github.com/Brain-Wave-Ecosystem/go-common/pkg/error"
 
