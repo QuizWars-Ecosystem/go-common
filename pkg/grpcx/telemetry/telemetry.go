@@ -10,8 +10,11 @@ import (
 	"time"
 )
 
-func NewTracerProvider(ctx context.Context, name string) (*sdktrace.TracerProvider, error) {
-	exporter, err := otlptracegrpc.New(ctx)
+func NewTracerProvider(ctx context.Context, name, collectorURL string) (*sdktrace.TracerProvider, error) {
+	exporter, err := otlptracegrpc.New(ctx,
+		otlptracegrpc.WithEndpoint(collectorURL),
+		otlptracegrpc.WithInsecure(),
+	)
 	if err != nil {
 		return nil, err
 	}
