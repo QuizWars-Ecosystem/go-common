@@ -14,6 +14,7 @@ type GatewayConfig struct {
 	StopTimeout  time.Duration `mapstructure:"stop_timeout"`
 	ConsulURL    string        `mapstructure:"consul_url"`
 	Metrics      *Metrics      `mapstructure:"metrics"`
+	Telemetry    *Telemetry    `mapstructure:"telemetry"`
 }
 
 type ServiceConfig struct {
@@ -25,6 +26,7 @@ type ServiceConfig struct {
 	StopTimeout  time.Duration `mapstructure:"stop_timeout"`
 	ConsulURL    string        `mapstructure:"consul_url"`
 	Metrics      *Metrics      `mapstructure:"metrics"`
+	Telemetry    *Telemetry    `mapstructure:"telemetry"`
 }
 
 type DefaultGatewayConfig struct {
