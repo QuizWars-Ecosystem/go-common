@@ -2,12 +2,13 @@ package telemetry
 
 import (
 	"context"
+	"time"
+
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.30.0"
-	"time"
 )
 
 func NewTracerProvider(ctx context.Context, name, collectorURL string) (*sdktrace.TracerProvider, error) {
