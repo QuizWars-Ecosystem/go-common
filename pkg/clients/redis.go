@@ -3,6 +3,8 @@ package clients
 import (
 	"context"
 	"crypto/tls"
+	"github.com/redis/go-redis/extra/redisotel/v9"
+	"go.opentelemetry.io/otel/trace"
 	"net"
 	"time"
 
@@ -36,11 +38,19 @@ func NewRedisClient(url string, options *RedisOptions) (*redis.Client, error) {
 		return nil, apperrors.Internal(err)
 	}
 
+	if opts.traceEnabled {
+		if err := redisotel.InstrumentTracing(client, redisotel.WithTracerProvider(opts.provider)); err != nil {
+			return nil, apperrors.Internal(err)
+		}
+	}
+
 	return client, nil
 }
 
 type RedisOptions struct {
 	*redis.Options
+	traceEnabled bool
+	provider     trace.TracerProvider
 }
 
 func NewRedisOptions(url string) *RedisOptions {
@@ -102,5 +112,11 @@ func (o *RedisOptions) WithLimiter(limiter redis.Limiter) *RedisOptions {
 
 func (o *RedisOptions) WithTLSConfig(tlsConfig *tls.Config) *RedisOptions {
 	o.TLSConfig = tlsConfig
+	return o
+}
+
+func (o *RedisOptions) WithTraceProvider(provider trace.TracerProvider) *RedisOptions {
+	o.traceEnabled = true
+	o.provider = provider
 	return o
 }

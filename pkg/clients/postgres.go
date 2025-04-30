@@ -2,6 +2,8 @@ package clients
 
 import (
 	"context"
+	"github.com/exaring/otelpgx"
+	"go.opentelemetry.io/otel/trace"
 	"net"
 	"time"
 
@@ -27,6 +29,10 @@ func NewPostgresClient(ctx context.Context, url string, options *PostgresOptions
 		return nil, apperrors.Internal(err)
 	}
 
+	if opts.traceEnabled {
+		_ = otelpgx.RecordStats(client)
+	}
+
 	if err = client.Ping(pingCtx); err != nil {
 		return nil, apperrors.Internal(err)
 	}
@@ -36,6 +42,7 @@ func NewPostgresClient(ctx context.Context, url string, options *PostgresOptions
 
 type PostgresOptions struct {
 	*pgxpool.Config
+	traceEnabled bool
 }
 
 func NewPostgresOptions(url string) *PostgresOptions {
@@ -92,5 +99,13 @@ func (o *PostgresOptions) WithMaxCons(amount int32) *PostgresOptions {
 
 func (o *PostgresOptions) WithConnMaxLifetime(time time.Duration) *PostgresOptions {
 	o.MaxConnLifetime = time
+	return o
+}
+
+func (o *PostgresOptions) WithTracerProvider(provider trace.TracerProvider) *PostgresOptions {
+	o.traceEnabled = true
+	o.ConnConfig.Tracer = otelpgx.NewTracer(
+		otelpgx.WithTracerProvider(provider),
+	)
 	return o
 }
