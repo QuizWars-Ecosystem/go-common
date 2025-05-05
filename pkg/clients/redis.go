@@ -120,3 +120,28 @@ func (o *RedisOptions) WithTraceProvider(provider trace.TracerProvider) *RedisOp
 	o.provider = provider
 	return o
 }
+
+func (o *RedisOptions) WithPoolSize(poolSize int) *RedisOptions {
+	o.PoolSize = poolSize
+	return o
+}
+
+func (o *RedisOptions) WithReadTimeout(timeout time.Duration) *RedisOptions {
+	o.ReadTimeout = timeout
+	return o
+}
+
+func (o *RedisOptions) WithWriteTimeout(timeout time.Duration) *RedisOptions {
+	o.WriteTimeout = timeout
+	return o
+}
+
+func (o *RedisOptions) WithConnMaxIdleTimeout(timeout time.Duration) *RedisOptions {
+	o.ConnMaxIdleTime = timeout
+	return o
+}
+
+func (o *RedisOptions) WithMaxActiveConns(maxActiveConns int) *RedisOptions {
+	o.MaxActiveConns = maxActiveConns
+	return o
+}
