@@ -3,10 +3,11 @@ package clients
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/redis/go-redis/extra/redisotel/v9"
 	"github.com/redis/go-redis/v9"
 	"go.opentelemetry.io/otel/trace"
-	"time"
 )
 
 type RedisClusterOptions struct {

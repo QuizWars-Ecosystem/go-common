@@ -2,9 +2,10 @@ package clients
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/nats-io/nats.go"
 	"go.uber.org/zap"
-	"time"
 )
 
 type NATSOptions struct {

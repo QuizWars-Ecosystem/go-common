@@ -21,6 +21,7 @@ require (
 	github.com/jackc/tern v1.13.0
 	github.com/joho/godotenv v1.5.1
 	github.com/lann/builder v0.0.0-20180802200727-47ae307949d0
+	github.com/nats-io/nats.go v1.42.0
 	github.com/prometheus/client_golang v1.21.1
 	github.com/redis/go-redis/extra/redisotel/v9 v9.8.0
 	github.com/redis/go-redis/v9 v9.8.0
@@ -108,7 +109,6 @@ require (
 	github.com/moby/term v0.5.2 // indirect
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
-	github.com/nats-io/nats.go v1.42.0 // indirect
 	github.com/nats-io/nkeys v0.4.11 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
