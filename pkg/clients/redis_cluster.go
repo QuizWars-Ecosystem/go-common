@@ -40,13 +40,22 @@ func NewRedisClusterOptions(addrs []string) *RedisClusterOptions {
 	}
 }
 
-func NewRedisClusterClient(ctx context.Context, opts *RedisClusterOptions) (*redis.ClusterClient, error) {
+func NewRedisClusterClient(opts *RedisClusterOptions) (*redis.ClusterClient, error) {
 	client := redis.NewClusterClient(opts.ClusterOptions)
 
-	pingCtx, cancel := context.WithTimeout(ctx, time.Second*15)
+	pingCtx, cancel := context.WithTimeout(context.Background(), time.Second*15)
 	defer cancel()
 
-	if err := client.Ping(pingCtx).Err(); err != nil {
+	var lastErr, err error
+	for i := 0; i < opts.MaxRetries; i++ {
+		if err = client.Ping(pingCtx).Err(); err == nil {
+			break
+		}
+
+		lastErr = err
+		time.Sleep(time.Second * time.Duration(i+1))
+	}
+	if lastErr != nil {
 		return nil, fmt.Errorf("redis cluster ping failed: %w", err)
 	}
 
