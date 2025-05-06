@@ -32,16 +32,24 @@ func NewNATSClient(opts *NATSOptions, logger *zap.Logger) (*nats.Conn, error) {
 		nats.MaxReconnects(opts.MaxReconnect),
 		nats.ReconnectWait(opts.ReconnectWait),
 		nats.DisconnectErrHandler(func(_ *nats.Conn, disconnectErr error) {
-			logger.Warn("NATS disconnected", zap.Error(disconnectErr))
+			if disconnectErr != nil {
+				logger.Warn("NATS disconnected", zap.Error(disconnectErr))
+			}
 		}),
 		nats.ReconnectHandler(func(nc *nats.Conn) {
-			logger.Warn("NATS connected", zap.String("to", nc.ConnectedUrl()))
+			if nc != nil {
+				logger.Warn("NATS connected", zap.String("to", nc.ConnectedUrl()))
+			}
 		}),
 		nats.ClosedHandler(func(nc *nats.Conn) {
-			logger.Info("NATS connection closed", zap.Error(nc.LastError()))
+			if nc != nil {
+				logger.Info("NATS connection closed", zap.Error(nc.LastError()))
+			}
 		}),
 		nats.ErrorHandler(func(_ *nats.Conn, _ *nats.Subscription, err error) {
-			logger.Error("NATS connection error", zap.Error(err))
+			if err != nil {
+				logger.Error("NATS connection error", zap.Error(err))
+			}
 		}),
 	)
 	if err != nil {
