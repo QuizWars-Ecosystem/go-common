@@ -60,7 +60,7 @@ func NewRedisClusterClient(opts *RedisClusterOptions) (*redis.ClusterClient, err
 	}
 
 	if opts.traceEnabled {
-		if err := redisotel.InstrumentTracing(client, redisotel.WithTracerProvider(opts.provider)); err != nil {
+		if err = redisotel.InstrumentTracing(client, redisotel.WithTracerProvider(opts.provider)); err != nil {
 			return nil, fmt.Errorf("redis otel init failed: %w", err)
 		}
 	}
