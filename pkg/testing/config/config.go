@@ -38,6 +38,18 @@ func DefaultRedisConfig() RedisConfig {
 	}
 }
 
+type RedisClusterConfig struct {
+	RedisConfig
+	ClusterSize int
+}
+
+func DefaultRedisClusterConfig() RedisClusterConfig {
+	return RedisClusterConfig{
+		RedisConfig: DefaultRedisConfig(),
+		ClusterSize: 3,
+	}
+}
+
 type ConsulConfig struct {
 	Name  string
 	Image string
@@ -67,5 +79,23 @@ func DefaultKafkaConfig() KafkaConfig {
 		Image:     "confluentinc/confluent-local:7.9.0",
 		ClusterID: "kafka-test",
 		Ports:     []int{9092, 9093, 9094, 9095},
+	}
+}
+
+type NatsConfig struct {
+	Name      string
+	Image     string
+	ClusterID string
+	Command   string
+	Ports     []int
+}
+
+func DefaultNatsConfig() NatsConfig {
+	return NatsConfig{
+		Name:      "nats",
+		Image:     "nats:2-alpine3.21",
+		ClusterID: "nats-test",
+		Command:   "command: -js -m 8222",
+		Ports:     []int{4222, 8222},
 	}
 }

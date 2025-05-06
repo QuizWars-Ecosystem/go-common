@@ -27,9 +27,10 @@ require (
 	github.com/redis/go-redis/v9 v9.8.0
 	github.com/spf13/viper v1.20.1
 	github.com/stretchr/testify v1.10.0
-	github.com/testcontainers/testcontainers-go v0.36.0
+	github.com/testcontainers/testcontainers-go v0.37.0
 	github.com/testcontainers/testcontainers-go/modules/consul v0.36.0
 	github.com/testcontainers/testcontainers-go/modules/kafka v0.36.0
+	github.com/testcontainers/testcontainers-go/modules/nats v0.37.0
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.36.0
 	github.com/testcontainers/testcontainers-go/modules/redis v0.36.0
 	go.opentelemetry.io/otel v1.35.0
@@ -94,7 +95,7 @@ require (
 	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20250317134145-8bc96cf8fc35 // indirect
-	github.com/magiconair/properties v1.8.9 // indirect
+	github.com/magiconair/properties v1.8.10 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mitchellh/copystructure v1.0.0 // indirect
