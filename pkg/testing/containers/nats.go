@@ -13,7 +13,6 @@ func NewNATSContainer(ctx context.Context, cfg *config.NatsConfig) (*nats.NATSCo
 	return nats.Run(
 		ctx,
 		cfg.Image,
-		testcontainers.WithHostPortAccess(cfg.Ports...),
 		testcontainers.WithExposedPorts("4222"),
 		testcontainers.WithWaitStrategy(wait.ForListeningPort("4222")),
 	)
