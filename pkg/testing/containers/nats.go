@@ -2,6 +2,7 @@ package containers
 
 import (
 	"context"
+
 	"github.com/testcontainers/testcontainers-go/wait"
 
 	"github.com/QuizWars-Ecosystem/go-common/pkg/testing/config"

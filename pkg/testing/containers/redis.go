@@ -3,11 +3,12 @@ package containers
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/QuizWars-Ecosystem/go-common/pkg/testing/config"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/redis"
 	"github.com/testcontainers/testcontainers-go/wait"
-	"time"
 )
 
 func NewRedisContainer(ctx context.Context, cfg *config.RedisConfig) (*redis.RedisContainer, error) {
@@ -35,15 +36,15 @@ func NewRedisClusterContainers(ctx context.Context, cfg *config.RedisClusterConf
 				"REDIS_NODES":               fmt.Sprint(cfg.Nodes),
 				"REDIS_CLUSTER_REPLICAS":    fmt.Sprint(cfg.Replicas),
 				"REDIS_CLUSTER_ANNOUNCE_IP": "host.docker.internal",
+				"ALLOW_EMPTY_PASSWORD":      "yes",
 			},
 			WaitingFor: wait.ForAll(
-				wait.ForLog("Cluster state changed: ok").WithStartupTimeout(time.Minute*5),
-				wait.ForListeningPort("6379").WithStartupTimeout(time.Minute*5),
+				wait.ForLog("Ready to accept connections").WithStartupTimeout(2*time.Minute),
+				wait.ForListeningPort("6379").WithStartupTimeout(2*time.Minute),
 			),
 		},
 		Started: true,
 	})
-
 	if err != nil {
 		return nil, fmt.Errorf("failed to start redis cluster container: %w", err)
 	}
