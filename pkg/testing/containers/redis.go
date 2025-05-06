@@ -28,14 +28,19 @@ func NewRedisClusterContainers(ctx context.Context, cfg *config.RedisClusterConf
 		cfg.Replicas = 1
 	}
 
+	exposedPorts := make([]string, cfg.Nodes)
+	for i := 0; i < cfg.Nodes; i++ {
+		exposedPorts[i] = fmt.Sprintf("%d/tcp", 6379+i)
+	}
+
 	container, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
 		ContainerRequest: testcontainers.ContainerRequest{
 			Image:        cfg.Image,
-			ExposedPorts: []string{"6379-6384:6379-6384"},
+			ExposedPorts: exposedPorts,
 			Env: map[string]string{
 				"REDIS_NODES":               fmt.Sprint(cfg.Nodes),
 				"REDIS_CLUSTER_REPLICAS":    fmt.Sprint(cfg.Replicas),
-				"REDIS_CLUSTER_ANNOUNCE_IP": "host.docker.internal",
+				"REDIS_CLUSTER_ANNOUNCE_IP": "127.0.0.1",
 				"ALLOW_EMPTY_PASSWORD":      "yes",
 			},
 			WaitingFor: wait.ForAll(
