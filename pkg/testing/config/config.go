@@ -43,17 +43,18 @@ type RedisClusterConfig struct {
 	Image    string
 	Host     string
 	Ports    []int
-	Nodes    int
+	Masters  int
 	Replicas int
+	Networks []string
 }
 
 func DefaultRedisClusterConfig() RedisClusterConfig {
 	return RedisClusterConfig{
 		Name:     "redis-cluster",
-		Image:    "bitnami/redis-cluster:7.4.3",
+		Image:    "grokzen/redis-cluster:6.2.5",
 		Host:     "localhost",
-		Ports:    []int{6379, 6380, 6381, 6382, 6383, 6384},
-		Nodes:    3,
+		Ports:    []int{7000, 7001, 7002, 7003, 7004, 7005},
+		Masters:  3,
 		Replicas: 1,
 	}
 }

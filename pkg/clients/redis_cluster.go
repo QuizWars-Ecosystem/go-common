@@ -43,7 +43,7 @@ func NewRedisClusterOptions(addrs []string) *RedisClusterOptions {
 func NewRedisClusterClient(opts *RedisClusterOptions) (*redis.ClusterClient, error) {
 	client := redis.NewClusterClient(opts.ClusterOptions)
 
-	pingCtx, cancel := context.WithTimeout(context.Background(), time.Second*15)
+	pingCtx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
 
 	var lastErr, err error
@@ -56,7 +56,7 @@ func NewRedisClusterClient(opts *RedisClusterOptions) (*redis.ClusterClient, err
 		time.Sleep(time.Second * time.Duration(i+1))
 	}
 	if lastErr != nil {
-		return nil, fmt.Errorf("redis cluster ping failed: %w", err)
+		return nil, fmt.Errorf("redis cluster ping failed: %w", lastErr)
 	}
 
 	if opts.traceEnabled {

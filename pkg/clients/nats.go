@@ -31,11 +31,11 @@ func NewNATSClient(opts *NATSOptions, logger *zap.Logger) (*nats.Conn, error) {
 		nats.Name(opts.Name),
 		nats.MaxReconnects(opts.MaxReconnect),
 		nats.ReconnectWait(opts.ReconnectWait),
-		nats.DisconnectErrHandler(func(_ *nats.Conn, err error) {
-			logger.Info("NATS disconnected", zap.String("reason", err.Error()))
+		nats.DisconnectErrHandler(func(_ *nats.Conn, disconnectErr error) {
+			logger.Warn("NATS disconnected", zap.Error(disconnectErr))
 		}),
 		nats.ReconnectHandler(func(nc *nats.Conn) {
-			logger.Info("NATS connected", zap.String("to", nc.ConnectedUrl()))
+			logger.Warn("NATS connected", zap.String("to", nc.ConnectedUrl()))
 		}),
 		nats.ClosedHandler(func(nc *nats.Conn) {
 			logger.Info("NATS connection closed", zap.Error(nc.LastError()))

@@ -3,6 +3,8 @@ package containers
 import (
 	"context"
 	"fmt"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/go-connections/nat"
 	"time"
 
 	"github.com/QuizWars-Ecosystem/go-common/pkg/testing/config"
@@ -20,39 +22,51 @@ func NewRedisContainer(ctx context.Context, cfg *config.RedisConfig) (*redis.Red
 }
 
 func NewRedisClusterContainers(ctx context.Context, cfg *config.RedisClusterConfig) (testcontainers.Container, error) {
-	if cfg.Nodes < 3 {
-		cfg.Nodes = 3
+	if cfg.Masters < 3 {
+		cfg.Masters = 3
 	}
 
-	if cfg.Replicas >= cfg.Nodes {
+	if cfg.Replicas >= cfg.Masters {
 		cfg.Replicas = 1
 	}
 
-	exposedPorts := make([]string, cfg.Nodes)
-	for i := 0; i < cfg.Nodes; i++ {
-		exposedPorts[i] = fmt.Sprintf("%d", 6379+i)
+	exposedPorts := make([]string, cfg.Masters)
+	for i := 0; i < cfg.Masters; i++ {
+		exposedPorts[i] = fmt.Sprintf("%d/tcp", 7000+i)
 	}
 
-	container, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
+	genericContainer, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
 		ContainerRequest: testcontainers.ContainerRequest{
 			Image:        cfg.Image,
-			ExposedPorts: exposedPorts,
+			ExposedPorts: []string{"7000/tcp", "7001/tcp", "7002/tcp", "7003/tcp", "7004/tcp", "7005/tcp"},
+			WaitingFor:   wait.ForLog("Cluster state changed: ok").WithStartupTimeout(2 * time.Minute),
 			Env: map[string]string{
-				"REDIS_NODES":               fmt.Sprint(cfg.Nodes),
-				"REDIS_CLUSTER_REPLICAS":    fmt.Sprint(cfg.Replicas),
+				"IP":                        "0.0.0.0",
+				"INITIAL_PORT":              "7000",
+				"CLUSTER_ONLY":              "true",
+				"STANDALONE":                "false",
+				"MASTERS":                   fmt.Sprint(cfg.Masters),
+				"REPLICAS":                  fmt.Sprint(cfg.Replicas),
+				"REDIS_CLUSTER_CREATOR":     "yes",
+				"REDIS_CLUSTER_REPLICAS":    "1",
 				"REDIS_CLUSTER_ANNOUNCE_IP": "host.docker.internal",
-				"ALLOW_EMPTY_PASSWORD":      "yes",
 			},
-			WaitingFor: wait.ForAll(
-				wait.ForLog("Ready to accept connections").WithStartupTimeout(2*time.Minute),
-				wait.ForListeningPort("6379").WithStartupTimeout(2*time.Minute),
-			),
+			HostConfigModifier: func(hc *container.HostConfig) {
+				hc.PortBindings = nat.PortMap{
+					"7000/tcp": []nat.PortBinding{{HostIP: "0.0.0.0", HostPort: "7000"}},
+					"7001/tcp": []nat.PortBinding{{HostIP: "0.0.0.0", HostPort: "7001"}},
+					"7002/tcp": []nat.PortBinding{{HostIP: "0.0.0.0", HostPort: "7002"}},
+					"7003/tcp": []nat.PortBinding{{HostIP: "0.0.0.0", HostPort: "7003"}},
+					"7004/tcp": []nat.PortBinding{{HostIP: "0.0.0.0", HostPort: "7004"}},
+					"7005/tcp": []nat.PortBinding{{HostIP: "0.0.0.0", HostPort: "7005"}},
+				}
+			},
 		},
 		Started: true,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to start redis cluster container: %w", err)
+		return nil, fmt.Errorf("failed to start redis cluster genericContainer: %w", err)
 	}
 
-	return container, nil
+	return genericContainer, nil
 }
