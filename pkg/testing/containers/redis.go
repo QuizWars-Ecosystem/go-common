@@ -3,9 +3,10 @@ package containers
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/go-connections/nat"
-	"time"
 
 	"github.com/QuizWars-Ecosystem/go-common/pkg/testing/config"
 	"github.com/testcontainers/testcontainers-go"
