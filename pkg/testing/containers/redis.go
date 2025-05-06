@@ -25,17 +25,19 @@ func NewRedisClusterContainers(ctx context.Context, cfg *config.RedisClusterConf
 		container, err := redis.Run(
 			ctx,
 			cfg.Image,
+			testcontainers.WithExposedPorts("6379"),
 			testcontainers.WithStartupCommand(
-				testcontainers.NewRawCommand([]string{
-					"redis-server",
-					"--port", "6379",
-					"--cluster-enabled", "yes",
-					"--cluster-config-file", fmt.Sprintf("nodes-%d.conf", i),
-					"--cluster-node-timeout", "5000",
-					"--appendonly", "yes",
-				}),
+				testcontainers.NewRawCommand(
+					[]string{
+						"redis-server",
+						"--port", "6379",
+						"--cluster-enabled", "yes",
+						"--cluster-config-file", fmt.Sprintf("nodes-%d.conf", i),
+						"--cluster-node-timeout", "5000",
+						"--appendonly", "yes",
+					},
+				),
 			),
-			testcontainers.WithExposedPorts("6379", "16379"),
 			testcontainers.WithWaitStrategy(wait.ForListeningPort("6379")),
 		)
 
@@ -99,7 +101,6 @@ func NewRedisClusterContainersV2(ctx context.Context, cfg *config.RedisClusterCo
 			cmd := fmt.Sprintf(
 				"redis-cli --cluster add-node %s %s", containerURLs[j], containerURLs[i],
 			)
-			// Здесь запускаем команду для объединения Redis контейнеров в кластер
 			_, err := exec.Command("bash", "-c", cmd).Output()
 			if err != nil {
 				return nil, nil, fmt.Errorf("failed to add node to cluster: %w", err)
