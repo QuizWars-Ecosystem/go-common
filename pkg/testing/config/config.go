@@ -31,25 +31,30 @@ type RedisConfig struct {
 
 func DefaultRedisConfig() RedisConfig {
 	return RedisConfig{
-		Name:  "redis-cluster",
-		Image: "grokzen/redis-cluster:7.2.5",
+		Name:  "redis",
+		Image: "redis:7.4-alpine",
 		Host:  "localhost",
-		Ports: []int{7000, 7001, 7002, 7003, 7004, 7005},
+		Ports: []int{6379},
 	}
 }
 
 type RedisClusterConfig struct {
-	RedisConfig
-	InitialPort     int
-	MasterNodes     int
-	SlavesPerMaster int
+	Name     string
+	Image    string
+	Host     string
+	Ports    []int
+	Nodes    int
+	Replicas int
 }
 
 func DefaultRedisClusterConfig() RedisClusterConfig {
 	return RedisClusterConfig{
-		RedisConfig:     DefaultRedisConfig(),
-		MasterNodes:     2,
-		SlavesPerMaster: 1,
+		Name:     "redis-cluster",
+		Image:    "bitnami/redis-cluster:7.4.3",
+		Host:     "localhost",
+		Ports:    []int{6379, 6380, 6381, 6382, 6383, 6384},
+		Nodes:    3,
+		Replicas: 1,
 	}
 }
 
