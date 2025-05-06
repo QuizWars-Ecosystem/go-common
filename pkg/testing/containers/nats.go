@@ -2,6 +2,9 @@ package containers
 
 import (
 	"context"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/go-connections/nat"
+	"time"
 
 	"github.com/testcontainers/testcontainers-go/wait"
 
@@ -14,7 +17,16 @@ func NewNATSContainer(ctx context.Context, cfg *config.NatsConfig) (*nats.NATSCo
 	return nats.Run(
 		ctx,
 		cfg.Image,
-		testcontainers.WithExposedPorts("4222"),
-		testcontainers.WithWaitStrategy(wait.ForListeningPort("4222")),
+		testcontainers.WithWaitStrategy(
+			wait.ForAll(
+				wait.ForLog("Server is ready"),
+				wait.ForListeningPort("4222/tcp"),
+			).WithDeadline(10*time.Second),
+		),
+		testcontainers.WithHostConfigModifier(func(hostConfig *container.HostConfig) {
+			hostConfig.PortBindings = nat.PortMap{
+				"4222/tcp": []nat.PortBinding{{HostIP: "0.0.0.0", HostPort: "4222"}},
+			}
+		}),
 	)
 }
