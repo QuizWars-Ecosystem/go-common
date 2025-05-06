@@ -40,7 +40,7 @@ func NewRedisClusterContainers(ctx context.Context, cfg *config.RedisClusterConf
 			Env: map[string]string{
 				"REDIS_NODES":               fmt.Sprint(cfg.Nodes),
 				"REDIS_CLUSTER_REPLICAS":    fmt.Sprint(cfg.Replicas),
-				"REDIS_CLUSTER_ANNOUNCE_IP": "127.0.0.1",
+				"REDIS_CLUSTER_ANNOUNCE_IP": "host.docker.internal",
 				"ALLOW_EMPTY_PASSWORD":      "yes",
 			},
 			WaitingFor: wait.ForAll(
