@@ -24,7 +24,17 @@ func NewRedisClusterContainers(ctx context.Context, cfg *config.RedisClusterConf
 		container, err := redis.Run(
 			ctx,
 			cfg.Image,
-			testcontainers.WithExposedPorts("6379"),
+			testcontainers.WithStartupCommand(
+				testcontainers.NewRawCommand([]string{
+					"redis-server",
+					"--port", "6379",
+					"--cluster-enabled", "yes",
+					"--cluster-config-file", fmt.Sprintf("nodes-%d.conf", i),
+					"--cluster-node-timeout", "5000",
+					"--appendonly", "yes",
+				}),
+			),
+			testcontainers.WithExposedPorts("6379", "16379"),
 			testcontainers.WithWaitStrategy(wait.ForListeningPort("6379")),
 		)
 
