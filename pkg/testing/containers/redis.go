@@ -30,7 +30,7 @@ func NewRedisClusterContainers(ctx context.Context, cfg *config.RedisClusterConf
 
 	exposedPorts := make([]string, cfg.Nodes)
 	for i := 0; i < cfg.Nodes; i++ {
-		exposedPorts[i] = fmt.Sprintf("%d/tcp", 6379+i)
+		exposedPorts[i] = fmt.Sprintf("%d", 6379+i)
 	}
 
 	container, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
